@@ -204,14 +204,17 @@ export const updateTeacher = async (
   }
 
   try {
-    const client = await clerkClient();
-
-    const user = await client.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
-    });
+    try {
+      const client = await clerkClient();
+      await client.users.updateUser(data.id, {
+        username: data.username,
+        ...(data.password !== "" && { password: data.password }),
+        firstName: data.name,
+        lastName: data.surname,
+      });
+    } catch (clerkError) {
+      console.log("Clerk user update skipped/failed:", clerkError);
+    }
 
     await prisma.teacher.update({
       where: {
@@ -251,9 +254,12 @@ export const deleteTeacher = async (
   const id = data.get("id") as string;
 
   try {
-    const client = await clerkClient();
-
-    await client.users.deleteUser(id);
+    try {
+      const client = await clerkClient();
+      await client.users.deleteUser(id);
+    } catch (clerkError) {
+      console.log("Clerk user delete skipped/failed:", clerkError);
+    }
 
     await prisma.teacher.delete({
       where: {
@@ -341,14 +347,17 @@ export const updateStudent = async (
   }
 
   try {
-    const client = await clerkClient();
-
-    const user = await client.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
-    });
+    try {
+      const client = await clerkClient();
+      await client.users.updateUser(data.id, {
+        username: data.username,
+        ...(data.password !== "" && { password: data.password }),
+        firstName: data.name,
+        lastName: data.surname,
+      });
+    } catch (clerkError) {
+      console.log("Clerk user update skipped/failed:", clerkError);
+    }
 
     await prisma.student.update({
       where: {
@@ -386,9 +395,12 @@ export const deleteStudent = async (
   const id = data.get("id") as string;
 
   try {
-    const client = await clerkClient();
-
-    await client.users.deleteUser(id);
+    try {
+      const client = await clerkClient();
+      await client.users.deleteUser(id);
+    } catch (clerkError) {
+      console.log("Clerk user delete skipped/failed:", clerkError);
+    }
 
     await prisma.student.delete({
       where: {
@@ -878,14 +890,17 @@ export const updateParent = async (
   }
 
   try {
-    const client = await clerkClient();
-
-    await client.users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
-    });
+    try {
+      const client = await clerkClient();
+      await client.users.updateUser(data.id, {
+        username: data.username,
+        ...(data.password !== "" && { password: data.password }),
+        firstName: data.name,
+        lastName: data.surname,
+      });
+    } catch (clerkError) {
+      console.log("Clerk user update skipped/failed:", clerkError);
+    }
 
     await prisma.parent.update({
       where: {
@@ -916,9 +931,12 @@ export const deleteParent = async (
   const id = data.get("id") as string;
 
   try {
-    const client = await clerkClient();
-
-    await client.users.deleteUser(id);
+    try {
+      const client = await clerkClient();
+      await client.users.deleteUser(id);
+    } catch (clerkError) {
+      console.log("Clerk user delete skipped/failed:", clerkError);
+    }
 
     await prisma.parent.delete({
       where: {
