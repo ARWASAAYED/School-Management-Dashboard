@@ -299,36 +299,67 @@ export const createStudent = async (
       return { success: false, error: true };
     }
 
+    // Resolve parent by either Clerk ID or username
+    const parent = await prisma.parent.findFirst({
+      where: {
+        OR: [
+          { id: data.parentId },
+          { username: data.parentId },
+        ],
+      },
+    });
+
+    if (!parent) {
+      console.log(`Parent not found for identifier: ${data.parentId}`);
+      return { success: false, error: true };
+    }
+
     const client = await clerkClient();
 
-    const user = await client.users.createUser({
-      username: data.username,
-      password: data.password,
-      firstName: data.name,
-      lastName: data.surname,
-      publicMetadata: {
-        role: "student",
-      },
-    });
-
-    await prisma.student.create({
-      data: {
-        id: user.id,
+    let user;
+    try {
+      user = await client.users.createUser({
         username: data.username,
-        name: data.name,
-        surname: data.surname,
-        email: data.email || null,
-        phone: data.phone || null,
-        address: data.address,
-        img: data.img || null,
-        bloodType: data.bloodType,
-        sex: data.sex,
-        birthday: data.birthday,
-        gradeId: data.gradeId,
-        classId: data.classId,
-        parentId: data.parentId,
-      },
-    });
+        password: data.password,
+        firstName: data.name,
+        lastName: data.surname,
+        publicMetadata: {
+          role: "student",
+        },
+      });
+    } catch (clerkErr) {
+      console.log("Error creating student in Clerk:", clerkErr);
+      return { success: false, error: true };
+    }
+
+    try {
+      await prisma.student.create({
+        data: {
+          id: user.id,
+          username: data.username,
+          name: data.name,
+          surname: data.surname,
+          email: data.email || null,
+          phone: data.phone || null,
+          address: data.address,
+          img: data.img || null,
+          bloodType: data.bloodType,
+          sex: data.sex,
+          birthday: data.birthday,
+          gradeId: data.gradeId,
+          classId: data.classId,
+          parentId: parent.id,
+        },
+      });
+    } catch (prismaErr) {
+      console.log("Error creating student in Prisma, rolling back Clerk user:", prismaErr);
+      try {
+        await client.users.deleteUser(user.id);
+      } catch (rollbackErr) {
+        console.log("Failed to rollback Clerk user:", rollbackErr);
+      }
+      return { success: false, error: true };
+    }
 
     revalidatePath("/list/students");
     return { success: true, error: false };
@@ -347,6 +378,21 @@ export const updateStudent = async (
   }
 
   try {
+    let resolvedParentId = data.parentId;
+    if (data.parentId) {
+      const parent = await prisma.parent.findFirst({
+        where: {
+          OR: [
+            { id: data.parentId },
+            { username: data.parentId },
+          ],
+        },
+      });
+      if (parent) {
+        resolvedParentId = parent.id;
+      }
+    }
+
     try {
       const client = await clerkClient();
       await client.users.updateUser(data.id, {
@@ -376,7 +422,7 @@ export const updateStudent = async (
         birthday: data.birthday,
         gradeId: data.gradeId,
         classId: data.classId,
-        parentId: data.parentId,
+        parentId: resolvedParentId,
       },
     });
 

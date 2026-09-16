@@ -73,7 +73,7 @@ const StudentForm = ({
     }
   }, [state, router, type, setOpen]);
 
-  const { grades, classes } = relatedData;
+  const { grades, classes, parents } = relatedData || {};
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -168,18 +168,54 @@ const StudentForm = ({
         <InputField
           label="Birthday"
           name="birthday"
-          defaultValue={data?.birthday.toISOString().split("T")[0]}
+          defaultValue={
+            data?.birthday
+              ? data.birthday instanceof Date
+                ? data.birthday.toISOString().split("T")[0]
+                : String(data.birthday).split("T")[0]
+              : ""
+          }
           register={register}
           error={errors.birthday}
           type="date"
         />
-        <InputField
-          label="Parent Id"
-          name="parentId"
-          defaultValue={data?.parentId}
-          register={register}
-          error={errors.parentId}
-        />
+        <div className="flex flex-col gap-2 w-full md:w-1/4">
+          <label className="text-xs text-gray-500">Parent</label>
+          {parents && parents.length > 0 ? (
+            <select
+              className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+              {...register("parentId")}
+              defaultValue={data?.parentId}
+            >
+              <option value="">Select a Parent</option>
+              {parents.map(
+                (parent: {
+                  id: string;
+                  name: string;
+                  surname: string;
+                  username: string;
+                }) => (
+                  <option value={parent.id} key={parent.id}>
+                    {parent.name} {parent.surname} (@{parent.username})
+                  </option>
+                )
+              )}
+            </select>
+          ) : (
+            <InputField
+              label="Parent (Username or ID)"
+              name="parentId"
+              defaultValue={data?.parentId}
+              register={register}
+              error={errors.parentId}
+            />
+          )}
+          {errors.parentId?.message && (
+            <p className="text-xs text-red-400">
+              {errors.parentId.message.toString()}
+            </p>
+          )}
+        </div>
         {data && (
           <InputField
             label="Id"

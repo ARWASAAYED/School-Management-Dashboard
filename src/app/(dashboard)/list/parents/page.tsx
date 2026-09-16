@@ -60,8 +60,9 @@ const renderRow = (item: ParentList) => (
   >
     <td className="flex items-center gap-4 p-4">
       <div className="flex flex-col">
-        <h3 className="font-semibold">{item.name}</h3>
-        <p className="text-xs text-gray-500">{item?.email}</p>
+        <h3 className="font-semibold">{item.name} {item.surname}</h3>
+        <p className="text-xs text-gray-500">{item?.email || item?.username}</p>
+        <span className="text-[10px] text-gray-400">@{item.username}</span>
       </div>
     </td>
     <td className="hidden md:table-cell">
