@@ -59,6 +59,24 @@ const LoginPage = () => {
           >
             Sign In
           </SignIn.Action>
+          <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-xs text-gray-600">
+            <p className="font-semibold text-yellow-700 mb-2">🔑 Demo Credentials (all use same password)</p>
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="text-yellow-700 border-b border-yellow-200">
+                  <th className="text-left pb-1 font-semibold">Role</th>
+                  <th className="text-left pb-1 font-semibold">Username</th>
+                </tr>
+              </thead>
+              <tbody className="space-y-1">
+                <tr><td className="py-0.5 pr-2 text-gray-500">Admin</td><td className="font-mono font-medium">admin</td></tr>
+                <tr><td className="py-0.5 pr-2 text-gray-500">Teacher</td><td className="font-mono font-medium">teacher1</td></tr>
+                <tr><td className="py-0.5 pr-2 text-gray-500">Student</td><td className="font-mono font-medium">student10</td></tr>
+                <tr><td className="py-0.5 pr-2 text-gray-500">Parent</td><td className="font-mono font-medium">parentId1</td></tr>
+              </tbody>
+            </table>
+            <p className="mt-2 text-gray-500">Password: <span className="font-mono font-medium text-gray-700">Password123!</span></p>
+          </div>
         </SignIn.Step>
       </SignIn.Root>
     </div>

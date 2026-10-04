@@ -19,7 +19,7 @@ const ClassListPage = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
 
-const { sessionClaims } = await auth();
+const { sessionClaims, userId } = await auth();
 const role = (sessionClaims?.metadata as { role?: string })?.role;
 
 
@@ -84,6 +84,15 @@ const renderRow = (item: ClassList) => (
   // URL PARAMS CONDITION
 
   const query: Prisma.ClassWhereInput = {};
+
+  // Teachers can only see classes they teach
+  if (role === "teacher") {
+    query.lessons = {
+      some: {
+        teacherId: userId!,
+      },
+    };
+  }
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {

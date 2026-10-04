@@ -10,8 +10,13 @@ const isConnectionError = (err: any) =>
   err?.code === "P1017";
 
 const prismaClientSingleton = () => {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    console.warn("[Prisma] Warning: DATABASE_URL environment variable is not defined.");
+  }
+
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL!,
+    connectionString: connectionString || "",
     max: 10,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 5000,

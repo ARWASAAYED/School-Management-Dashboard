@@ -19,7 +19,7 @@ const ParentListPage = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
 
-const { sessionClaims } = await auth();
+const { sessionClaims, userId } = await auth();
 const role = (sessionClaims?.metadata as { role?: string })?.role;
 
 
@@ -90,6 +90,21 @@ const renderRow = (item: ParentList) => (
   // URL PARAMS CONDITION
 
   const query: Prisma.ParentWhereInput = {};
+
+  // Teachers can only see parents of students in their classes
+  if (role === "teacher") {
+    query.students = {
+      some: {
+        class: {
+          lessons: {
+            some: {
+              teacherId: userId!,
+            },
+          },
+        },
+      },
+    };
+  }
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {

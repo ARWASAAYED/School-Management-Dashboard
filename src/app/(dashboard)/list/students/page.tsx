@@ -19,7 +19,7 @@ const StudentListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-  const { sessionClaims } =await auth();
+  const { sessionClaims, userId } = await auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;
 
   const columns = [
@@ -64,7 +64,7 @@ const StudentListPage = async ({
     >
       <td className="flex items-center gap-4 p-4">
         <Image
-          src={item.img || "/Avatar.png"}
+          src={item.img || "/avatar.png"}
           alt=""
           width={40}
           height={40}
@@ -104,6 +104,17 @@ const StudentListPage = async ({
   // URL PARAMS CONDITION
 
   const query: Prisma.StudentWhereInput = {};
+
+  // Teachers can only see students in their own classes
+  if (role === "teacher") {
+    query.class = {
+      lessons: {
+        some: {
+          teacherId: userId!,
+        },
+      },
+    };
+  }
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
