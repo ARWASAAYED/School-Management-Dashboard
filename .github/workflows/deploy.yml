@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - master
+      - starter
   pull_request:
     branches:
       - main
       - master
+      - starter
 
 env:
   NODE_OPTIONS: "--max-old-space-size=8192"
@@ -50,7 +52,7 @@ jobs:
   deploy-vercel:
     name: Deploy to Vercel
     needs: build-and-test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/starter')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
